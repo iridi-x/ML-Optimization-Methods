@@ -55,7 +55,7 @@ def least_square_method_np():
 
     # do we need to split features for this one? 
 
-    # create model
+    # create model - we need to split the data and pass it now 
     lsm_np = np.linalg.lstsq()
 
 
