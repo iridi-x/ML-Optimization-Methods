@@ -5,11 +5,26 @@ import time
 from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error as mse, r2_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LinearRegression
 
 # store resuslts of each model
 results = []
+
+# normailize data
+def normalize_data(data):
+    print("process data")
+
+    print("original Data:", data[2:])
+    scalar = StandardScaler()
+    # normalize the data
+    data_X = scalar.fit_transform(data)
+
+    print("Processed Data:", data_X[2:])
+
+    return data_X
+
+
 
 
 # EXAMPLE FROM LECTURE SLIDES 
@@ -65,11 +80,13 @@ def least_square_method_np():
 
     # 80 - 20 split, training to testing
     wine_X_train, wine_X_test, wine_y_train, wine_y_test = train_test_split(wine_X,wine_y, test_size=0.2, random_state=42)
+
    
     for order in range(1, 6): # this tests orders 1-5 
 
         order = PolynomialFeatures(order) # this uses Sklearn to create polynomial features from dataset
         X_train_polynomial = order.fit_transform(wine_X_train)
+        # X_train_standardized = normalize_data(X_train_polynomial)
         X_test_polynomial = order.transform(wine_X_test)
 
         # train and benchmark the model
