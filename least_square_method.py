@@ -1,29 +1,67 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import time
 
 from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error as mse, r2_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler, Normalizer
 from sklearn.linear_model import LinearRegression
 
 # store resuslts of each model
 results = []
 
-# normailize data
-def normalize_data(data):
+
+# scale data
+def scale_data(data):
     print("process data")
 
-    print("original Data:", data[2:])
+    print("original Data: \n", data[:1])
     scalar = StandardScaler()
     # normalize the data
     data_X = scalar.fit_transform(data)
 
-    print("Processed Data:", data_X[2:])
+    print("Processed Data:\n", data_X[:1])
 
     return data_X
 
+
+# normailize data
+def normalize_data(data):
+    print("process data")
+
+    print("original Data: \n", data[:1])
+    normal = Normalizer(norm='l2')
+    # normalize the data
+    data_X = normal.fit_transform(data)
+
+    print("Processed Data:\n", data_X[:1])
+
+    return data_X
+
+
+
+
+
+def import_wine_data_from_csv():
+    # wine_data = np.genfromtxt('wine_data.csv', delimiter=',')
+
+    wine_data = pd.read_csv('wine_data.csv', delimiter=';', index_col=False)
+
+    wine_y = wine_data["quality"].to_frame()
+    wine_X = wine_data.drop(["quality"], axis=1)
+
+
+    # split the data into X and Y, Y being quality
+
+    # print("loaded data:", wine_data)
+    # print("wine_X :", wine_X)
+    # print("wine_ y:", wine_y)
+    # wine_X = scale_data(wine_X)
+    # wine_X = normalize_data(wine_X)
+
+    return wine_X, wine_y
 
 
 
@@ -74,14 +112,27 @@ def regressionExampleDiabetes():
 def least_square_method_np():
 
     # load the dataset
-    wine_X, wine_y = datasets.load_wine(return_X_y=True)
+    # wine_X, wine_y = datasets.load_wine(return_X_y=True)  
+    wine_X, wine_y = import_wine_data_from_csv()
+
+    #  normalize the data 
+    # wine_y = normalize_data(wine_y)
+    # wine_X = normalize_data(wine_X)
+
+    wine_X = scale_data(wine_X)
+    # wine_y = scale_data(wine_y)
+
+
+
+    # print("wine X: \n", wine_X[:1])
 
     # do we need to split features for this one? 
 
     # 80 - 20 split, training to testing
     wine_X_train, wine_X_test, wine_y_train, wine_y_test = train_test_split(wine_X,wine_y, test_size=0.2, random_state=42)
 
-   
+
+
     for order in range(1, 6): # this tests orders 1-5 
 
         order = PolynomialFeatures(order) # this uses Sklearn to create polynomial features from dataset
@@ -112,6 +163,12 @@ def least_square_method_np():
         test_r2       = r2_score(wine_y_test, y_test_pred)
         training_time = (end_time - start_time)
 
+        weights = model.coef_
+        intercept = model.intercept_
+
+        # print("Weights (coefficients):", weights)
+        # print("Intercept (bias):", intercept)
+
         # add data object to results array 
         results.append({
             "Order": order.degree,
@@ -123,6 +180,7 @@ def least_square_method_np():
             "Testing RMSE": test_rmse,
             "Testing R2":  test_r2
         })
+        
  
     # print results of all models
     print(f"{'Degree/Order':<15} {'Training RMSE':<15} {'Training R²':<15} {'Training Time':<15} {'Testing RMSE':<15} {'Testing R²':<15}")
@@ -140,6 +198,7 @@ def main():
     print("main")
     # regressionExampleDiabetes()
     least_square_method_np()
+
 
 
 
