@@ -18,8 +18,8 @@ def scale_data(data):
     print("process data")
 
     print("original Data: \n", data[:1])
+    # scale the data
     scalar = StandardScaler()
-    # normalize the data
     data_X = scalar.fit_transform(data)
 
     print("Processed Data:\n", data_X[:1])
@@ -32,15 +32,13 @@ def normalize_data(data):
     print("process data")
 
     print("original Data: \n", data[:1])
-    normal = Normalizer(norm='l2')
     # normalize the data
+    normal = Normalizer(norm='l2')
     data_X = normal.fit_transform(data)
 
     print("Processed Data:\n", data_X[:1])
 
     return data_X
-
-
 
 
 
@@ -51,15 +49,6 @@ def import_wine_data_from_csv():
 
     wine_y = wine_data["quality"].to_frame()
     wine_X = wine_data.drop(["quality"], axis=1)
-
-
-    # split the data into X and Y, Y being quality
-
-    # print("loaded data:", wine_data)
-    # print("wine_X :", wine_X)
-    # print("wine_ y:", wine_y)
-    # wine_X = scale_data(wine_X)
-    # wine_X = normalize_data(wine_X)
 
     return wine_X, wine_y
 
@@ -107,6 +96,10 @@ def regressionExampleDiabetes():
     plt.show()
 
 
+def least_square_solution():
+    print("lssq")
+
+
 
 
 def least_square_method_np():
@@ -117,28 +110,23 @@ def least_square_method_np():
 
     #  normalize the data 
     # wine_y = normalize_data(wine_y)
-    # wine_X = normalize_data(wine_X)
+    wine_X = normalize_data(wine_X)
 
-    wine_X = scale_data(wine_X)
+    # wine_X = scale_data(wine_X)
     # wine_y = scale_data(wine_y)
-
-
-
-    # print("wine X: \n", wine_X[:1])
-
-    # do we need to split features for this one? 
 
     # 80 - 20 split, training to testing
     wine_X_train, wine_X_test, wine_y_train, wine_y_test = train_test_split(wine_X,wine_y, test_size=0.2, random_state=42)
-
-
 
     for order in range(1, 6): # this tests orders 1-5 
 
         order = PolynomialFeatures(order) # this uses Sklearn to create polynomial features from dataset
         X_train_polynomial = order.fit_transform(wine_X_train)
-        # X_train_standardized = normalize_data(X_train_polynomial)
         X_test_polynomial = order.transform(wine_X_test)
+
+        # alternate attempt
+        # X_train_polynomial = order.transform(wine_X_train)
+        # X_test_polynomial = order.transform(wine_X_test)
 
         # train and benchmark the model
         model = LinearRegression()
@@ -156,7 +144,7 @@ def least_square_method_np():
         y_train_pred = model.predict(X_train_polynomial)
         y_test_pred  = model.predict(X_test_polynomial)
 
-        # get perfimance metrics
+        # get performance metrics
         training_rmse = np.sqrt(mse(wine_y_train, y_train_pred))
         test_rmse     = np.sqrt(mse(wine_y_test, y_test_pred))
         train_r2      = r2_score(wine_y_train, y_train_pred) 
@@ -166,8 +154,10 @@ def least_square_method_np():
         weights = model.coef_
         intercept = model.intercept_
 
-        # print("Weights (coefficients):", weights)
-        # print("Intercept (bias):", intercept)
+
+        if order.degree == 2:
+            print("Weights (coefficients):", weights)
+            print("Intercept (bias):", intercept)
 
         # add data object to results array 
         results.append({
