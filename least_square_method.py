@@ -158,6 +158,14 @@ def least_square_method_np():
         if order.degree == 2:
             print("Weights (coefficients):", weights)
             print("Intercept (bias):", intercept)
+            
+            print("Polynomial function \n")
+            terms = []
+            for i, coef in enumerate(weights):
+                if i == 0:
+                    terms.append(f"{intercept:.2f}")  # The intercept term
+                else:
+                    terms.append(f"{coef:.2f} * x^{i}")
 
         # add data object to results array 
         results.append({
