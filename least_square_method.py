@@ -122,16 +122,8 @@ def least_square_method_np():
     wine_X = scale_data(wine_X)
     # wine_y = scale_data(wine_y)
 
-
-
-    # print("wine X: \n", wine_X[:1])
-
-    # do we need to split features for this one? 
-
     # 80 - 20 split, training to testing
     wine_X_train, wine_X_test, wine_y_train, wine_y_test = train_test_split(wine_X,wine_y, test_size=0.2, random_state=42)
-
-
 
     for order in range(1, 6): # this tests orders 1-5 
 
@@ -166,8 +158,16 @@ def least_square_method_np():
         weights = model.coef_
         intercept = model.intercept_
 
-        # print("Weights (coefficients):", weights)
-        # print("Intercept (bias):", intercept)
+        if order.degree == 2:
+          print("Weights (coefficients):", weights)
+          print("Intercept (bias):", intercept)
+
+        #   print model as polynomial function
+        if order.degree == 2:
+            print("Polynomial function: ", end='')
+            for i in range(order.n_features_in_):
+                print(f" + {weights[i]} * x{i}^2", end='')
+                print(f" + {intercept}")
 
         # add data object to results array 
         results.append({
