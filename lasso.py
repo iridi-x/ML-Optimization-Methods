@@ -94,14 +94,14 @@ def lasso_sklearn(X, y):
 
         print("Polynomial function:", polynomial_function)
 
-        # Identify features with zero coefficients
-        zero_coef_features = [poly_features[i] for i, coef in enumerate(coefficients) if coef == 0]
+        # # Identify features with zero coefficients
+        # zero_coef_features = [poly_features[i] for i, coef in enumerate(coefficients) if coef == 0]
 
-        # Identify features with non-zero coefficients (the ones retained by the model)
-        non_zero_coef_features = [poly_features[i] for i, coef in enumerate(coefficients) if coef != 0]
+        # # Identify features with non-zero coefficients (the ones retained by the model)
+        # non_zero_coef_features = [poly_features[i] for i, coef in enumerate(coefficients) if coef != 0]
 
-        print("\n\nFeatures to remove (zero coefficients):", zero_coef_features)
-        print("Features retained:", non_zero_coef_features)
+        # print("\n\nFeatures to remove (zero coefficients):", zero_coef_features)
+        # print("Features retained:", non_zero_coef_features)
 
     return results
 

@@ -180,8 +180,8 @@ def least_square_method_np(wine_X, wine_y):
             # print("Intercept: \n", intercept,"\n Weights: \n", weights)
 
 
-            manual_w = calculate_w(X_train_polynomial, wine_y_train)
-            # print(manual_w.T);;
+            # manual_w = calculate_w(X_train_polynomial, wine_y_train)
+            # print(manual_w.T)
 
             # treain manual model
             man_start_time = time.time()
@@ -217,10 +217,6 @@ def least_square_method_np(wine_X, wine_y):
             coefficients = model.coef_.flatten()
             intercept = model.intercept_
 
-
-            poly_features = poly.get_feature_names_out()
-
-
             # Combine terms into a readable equation
             terms = [f"{intercept[0]:.2}"]  # Use intercept directly as a float
 
@@ -230,8 +226,6 @@ def least_square_method_np(wine_X, wine_y):
                     # Check if coefficient is not zero and if it's a linear (degree 1) or quadratic (degree 2) term
                 if coef != 0.0 and (0 <= index < 2 * num_features + 1):
                     terms.append(f"{coef:.2f} * x{index + 1}")  # Use x0 for intercept, x1, x2,... for features
-
-
 
 
             # Join all terms to create the polynomial function string
