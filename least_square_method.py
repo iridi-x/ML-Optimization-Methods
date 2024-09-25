@@ -1,9 +1,7 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import time
 
-from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error as mse, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler, Normalizer
@@ -79,7 +77,7 @@ def import_wine_data_from_csv():
 
 
 def calculate_w(data_X, data_y):
-    print("Manual Weights:")
+    # print("Manual Weights:")
     X = np.array(data_X)
     y = np.array(data_y)
     X_t = X.T
@@ -92,9 +90,7 @@ def calculate_w(data_X, data_y):
 
 
 def least_square_solution(train_data_X, train_data_y, X_new):
-    print("Training target statistics:")
-    print(f"Min: {np.min(train_data_y)}, Max: {np.max(train_data_y)}, Mean: {np.mean(train_data_y)}")
-
+   
 
     X = np.array(train_data_X)
     y = np.array(train_data_y)
@@ -134,9 +130,9 @@ def least_square_method_np(wine_X, wine_y):
 
         wine_X_train, wine_X_test, wine_y_train, wine_y_test = train_test_split(wine_X,wine_y, test_size=0.2, random_state=(42+order))
 
-        order = PolynomialFeatures(order) # this uses Sklearn to create polynomial features from dataset
-        X_train_polynomial = order.fit_transform(wine_X_train)
-        X_test_polynomial = order.transform(wine_X_test)
+        poly = PolynomialFeatures(order) # this uses Sklearn to create polynomial features from dataset
+        X_train_polynomial = poly.fit_transform(wine_X_train)
+        X_test_polynomial = poly.transform(wine_X_test)
 
         # train and benchmark the model
         model = LinearRegression()
@@ -161,14 +157,14 @@ def least_square_method_np(wine_X, wine_y):
         test_r2       = r2_score(wine_y_test, y_test_pred)
         training_time = (end_time - start_time)
 
-        weights = model.coef_
-        intercept = model.intercept_
+
+
 
 
         # add data object to results array 
         results.append({
             "Type": "Sklearn",
-            "Order": order.degree,
+            "Order": order,
             # RMSE measures the distance from prediction to actual, with 0 being no different between predic and actual
             "Training RMSE": training_rmse,
             # R2 is somewhat inverse to RMSE, where a value of 1 indicates no difference between prediction and actual
@@ -179,14 +175,13 @@ def least_square_method_np(wine_X, wine_y):
         })
 
         # for our selected model
-        if order.degree == 2:
-            print("order:", order.degree)
-            print("Intercept: \n", intercept,"\n Weights: \n", weights)
+        if order == 2:
+            print("order:", order)
+            # print("Intercept: \n", intercept,"\n Weights: \n", weights)
 
 
-            print("\n Calculate w manually and compare: \n")
             manual_w = calculate_w(X_train_polynomial, wine_y_train)
-            print(manual_w.T)
+            # print(manual_w.T);;
 
             # treain manual model
             man_start_time = time.time()
@@ -208,7 +203,7 @@ def least_square_method_np(wine_X, wine_y):
             # append stats
             results.append({
                 "Type": "manual",
-                "Order": order.degree,
+                "Order": order,
                 # RMSE measures the distance from prediction to actual, with 0 being no different between predic and actual
                 "Training RMSE": man_training_rmse,
                 # R2 is somewhat inverse to RMSE, where a value of 1 indicates no difference between prediction and actual
@@ -217,6 +212,32 @@ def least_square_method_np(wine_X, wine_y):
                 "Testing RMSE": man_test_rmse,
                 "Testing R2":  man_test_r2
             })
+
+            num_features = wine_X.shape[1]
+            coefficients = model.coef_.flatten()
+            intercept = model.intercept_
+
+
+            poly_features = poly.get_feature_names_out()
+
+
+            # Combine terms into a readable equation
+            terms = [f"{intercept[0]:.2}"]  # Use intercept directly as a float
+
+
+            # terms = [f"{intercept[0]:.2f}"] + [f"{coef:.2f} * {term}" for coef, term in zip(coefficients, poly_features) if coef != 0]
+            for index, coef in enumerate(coefficients):
+                    # Check if coefficient is not zero and if it's a linear (degree 1) or quadratic (degree 2) term
+                if coef != 0.0 and (0 <= index < 2 * num_features + 1):
+                    terms.append(f"{coef:.2f} * x{index + 1}")  # Use x0 for intercept, x1, x2,... for features
+
+
+
+
+            # Join all terms to create the polynomial function string
+            polynomial_function = " + ".join(terms)
+
+            print("Polynomial function:", polynomial_function)
                 
     return results
 
@@ -228,10 +249,30 @@ def main():
     # import data 
     wine_X, wine_y = import_wine_data_from_csv()
 
-    # preprocess data
+ 
+
     print(f"Preprocessed: \n {wine_X[:1]}")
+
+    # preprocess data - scaling only columns with numbers greater than little to no effect
     wine_X = scale_0_1(wine_X)
+
+
+    # scale only columns whose max are greater than one (this is for numpy arrays)
+    # for column in range(wine_X.shape[1]):
+    #     if np.max(wine_X[:, column]) > 1:
+    #         wine_X[:,column] = scale_0_1(wine_X[:, column])
+
+    # # for pd.df
+    # for col in wine_X.columns:
+    #     if wine_X[col].max() >1:
+    #         wine_X[col] = scale_0_1(wine_X[col])
+
+    # wine_y = scale_0_1(wine_y)
     print(f"Processed: \n {wine_X[:1]} \n\n")
+
+    
+    print(f"Min: {np.min(wine_y)}, Max: {np.max(wine_y)}, Mean: {np.mean(wine_y)}")
+
 
 
     results = least_square_method_np(wine_X, wine_y)    
